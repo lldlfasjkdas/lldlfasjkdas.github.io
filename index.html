@@ -465,9 +465,9 @@ const ctx = canvas.getContext('2d');
 let W, H;
 const particles = [];
 const connections = [];
-const PARTICLE_COUNT = 80;
-const CONNECT_DIST = 150;
-const MOUSE_DIST = 200;
+const PARTICLE_COUNT = 45;
+const CONNECT_DIST = 160;
+const MOUSE_DIST = 180;
 let mouse = { x: -1000, y: -1000, down: false };
 let clickPoint = null;
 
@@ -482,12 +482,12 @@ class Particle {
     constructor(x, y) {
         this.x = x || Math.random() * W;
         this.y = y || Math.random() * H;
-        this.vx = (Math.random() - 0.5) * 0.6;
-        this.vy = (Math.random() - 0.5) * 0.6;
-        this.r = Math.random() * 2 + 1;
-        this.baseAlpha = Math.random() * 0.5 + 0.2;
+        this.vx = (Math.random() - 0.5) * 0.3;
+        this.vy = (Math.random() - 0.5) * 0.3;
+        this.r = Math.random() * 1.5 + 0.8;
+        this.baseAlpha = Math.random() * 0.25 + 0.08;
         this.alpha = this.baseAlpha;
-        this.hue = Math.random() * 60 + 200; // blue-purple range
+        this.hue = Math.random() * 40 + 210; // soft blue-lavender range
     }
     update() {
         this.x += this.vx;
@@ -500,10 +500,10 @@ class Particle {
         const dy = mouse.y - this.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < MOUSE_DIST) {
-            const force = (MOUSE_DIST - dist) / MOUSE_DIST * 0.02;
+            const force = (MOUSE_DIST - dist) / MOUSE_DIST * 0.008;
             this.vx += dx * force;
             this.vy += dy * force;
-            this.alpha = this.baseAlpha + (1 - dist / MOUSE_DIST) * 0.5;
+            this.alpha = this.baseAlpha + (1 - dist / MOUSE_DIST) * 0.25;
         } else {
             this.alpha += (this.baseAlpha - this.alpha) * 0.05;
         }
@@ -515,7 +515,7 @@ class Particle {
     draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${this.hue}, 80%, 70%, ${this.alpha})`;
+        ctx.fillStyle = `hsla(${this.hue}, 40%, 75%, ${this.alpha})`;
         ctx.fill();
     }
 }
@@ -534,13 +534,13 @@ class Connection {
     draw() {
         if (this.life <= 0) return;
         const grad = ctx.createLinearGradient(this.a.x, this.a.y, this.b.x, this.b.y);
-        grad.addColorStop(0, `hsla(${this.a.hue}, 80%, 60%, ${this.life * 0.6})`);
-        grad.addColorStop(1, `hsla(${this.b.hue}, 80%, 60%, ${this.life * 0.6})`);
+        grad.addColorStop(0, `hsla(${this.a.hue}, 35%, 70%, ${this.life * 0.35})`);
+        grad.addColorStop(1, `hsla(${this.b.hue}, 35%, 70%, ${this.life * 0.35})`);
         ctx.beginPath();
         ctx.moveTo(this.a.x, this.a.y);
         ctx.lineTo(this.b.x, this.b.y);
         ctx.strokeStyle = grad;
-        ctx.lineWidth = this.life * 2;
+        ctx.lineWidth = this.life * 1.2;
         ctx.stroke();
     }
 }
@@ -572,22 +572,22 @@ canvas.addEventListener('click', (e) => {
             connections.push(new Connection(nearby[i], nearby[j]));
         }
         // pulse effect
-        nearby[i].r = Math.min(nearby[i].r + 2, 6);
-        nearby[i].alpha = 1;
+        nearby[i].r = Math.min(nearby[i].r + 1, 4);
+        nearby[i].alpha = Math.min(nearby[i].alpha + 0.3, 0.6);
     }
 
-    // spawn a burst of new particles
-    for (let i = 0; i < 5; i++) {
-        const p = new Particle(cx + (Math.random() - 0.5) * 40, cy + (Math.random() - 0.5) * 40);
-        p.vx = (Math.random() - 0.5) * 3;
-        p.vy = (Math.random() - 0.5) * 3;
-        p.alpha = 1;
-        p.hue = Math.random() * 60 + 200;
+    // spawn a few new particles
+    for (let i = 0; i < 3; i++) {
+        const p = new Particle(cx + (Math.random() - 0.5) * 30, cy + (Math.random() - 0.5) * 30);
+        p.vx = (Math.random() - 0.5) * 1.5;
+        p.vy = (Math.random() - 0.5) * 1.5;
+        p.alpha = 0.4;
+        p.hue = Math.random() * 40 + 210;
         particles.push(p);
     }
 
     // cap particles
-    while (particles.length > PARTICLE_COUNT + 40) {
+    while (particles.length > PARTICLE_COUNT + 15) {
         particles.shift();
     }
 });
@@ -599,11 +599,11 @@ function drawProximityLines() {
             const dy = particles[i].y - particles[j].y;
             const dist = Math.sqrt(dx * dx + dy * dy);
             if (dist < CONNECT_DIST) {
-                const alpha = (1 - dist / CONNECT_DIST) * 0.15;
+                const alpha = (1 - dist / CONNECT_DIST) * 0.07;
                 ctx.beginPath();
                 ctx.moveTo(particles[i].x, particles[i].y);
                 ctx.lineTo(particles[j].x, particles[j].y);
-                ctx.strokeStyle = `rgba(100, 160, 255, ${alpha})`;
+                ctx.strokeStyle = `rgba(140, 170, 220, ${alpha})`;
                 ctx.lineWidth = 0.5;
                 ctx.stroke();
             }
@@ -616,7 +616,7 @@ function animate() {
 
     // subtle radial glow at center
     const grd = ctx.createRadialGradient(W / 2, H * 0.35, 0, W / 2, H * 0.35, W * 0.5);
-    grd.addColorStop(0, 'rgba(59, 130, 246, 0.03)');
+    grd.addColorStop(0, 'rgba(100, 140, 200, 0.02)');
     grd.addColorStop(1, 'rgba(6, 8, 13, 0)');
     ctx.fillStyle = grd;
     ctx.fillRect(0, 0, W, H);
