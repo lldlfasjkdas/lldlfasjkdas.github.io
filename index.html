@@ -526,7 +526,7 @@ class Connection {
         this.a = a;
         this.b = b;
         this.life = 1;
-        this.decay = 0.003;
+        this.decay = 0.015;
     }
     update() {
         this.life -= this.decay;
@@ -557,38 +557,31 @@ canvas.addEventListener('mouseleave', () => {
     mouse.x = -1000;
     mouse.y = -1000;
 });
+let lastClick = 0;
 canvas.addEventListener('click', (e) => {
+    // cooldown — max 1 click per 800ms
+    const now = Date.now();
+    if (now - lastClick < 800) return;
+    lastClick = now;
+
+    // max 8 connections at a time
+    if (connections.length >= 8) return;
+
     const cx = e.clientX;
     const cy = e.clientY;
 
-    // find nearby particles and connect them
-    const nearby = particles.filter(p => {
-        const d = Math.sqrt((p.x - cx) ** 2 + (p.y - cy) ** 2);
-        return d < MOUSE_DIST;
-    });
+    // find 3 closest particles
+    const sorted = particles
+        .map(p => ({ p, d: Math.sqrt((p.x - cx) ** 2 + (p.y - cy) ** 2) }))
+        .filter(o => o.d < MOUSE_DIST)
+        .sort((a, b) => a.d - b.d)
+        .slice(0, 3);
 
-    for (let i = 0; i < nearby.length; i++) {
-        for (let j = i + 1; j < nearby.length; j++) {
-            connections.push(new Connection(nearby[i], nearby[j]));
+    for (let i = 0; i < sorted.length; i++) {
+        for (let j = i + 1; j < sorted.length; j++) {
+            connections.push(new Connection(sorted[i].p, sorted[j].p));
         }
-        // pulse effect
-        nearby[i].r = Math.min(nearby[i].r + 1, 4);
-        nearby[i].alpha = Math.min(nearby[i].alpha + 0.3, 0.6);
-    }
-
-    // spawn a few new particles
-    for (let i = 0; i < 3; i++) {
-        const p = new Particle(cx + (Math.random() - 0.5) * 30, cy + (Math.random() - 0.5) * 30);
-        p.vx = (Math.random() - 0.5) * 1.5;
-        p.vy = (Math.random() - 0.5) * 1.5;
-        p.alpha = 0.4;
-        p.hue = Math.random() * 40 + 210;
-        particles.push(p);
-    }
-
-    // cap particles
-    while (particles.length > PARTICLE_COUNT + 15) {
-        particles.shift();
+        sorted[i].p.alpha = Math.min(sorted[i].p.alpha + 0.15, 0.4);
     }
 });
 
