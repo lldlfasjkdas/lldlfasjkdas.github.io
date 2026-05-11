@@ -15,97 +15,632 @@
       gtag('config', 'AW-18139879113');
     </script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
-            background: #0d1117;
-            color: #e6edf3;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #06080d;
+            color: #e2e8f0;
+            overflow-x: hidden;
         }
-        a { color: #58a6ff; text-decoration: none; }
-        a:hover { text-decoration: underline; }
+
+        canvas#bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            cursor: crosshair;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .content a, .content button {
+            pointer-events: auto;
+        }
+
+        a { color: #60a5fa; text-decoration: none; transition: color 0.2s; }
+        a:hover { color: #93c5fd; }
+
+        /* NAV */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #fff;
+        }
+        .nav-logo img { width: 32px; height: 32px; border-radius: 8px; }
+        .nav-links { display: flex; gap: 32px; }
+        .nav-links a {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+            pointer-events: auto;
+        }
+        .nav-links a:hover { color: #fff; }
+
+        /* HERO */
         .hero {
             text-align: center;
-            padding: 80px 20px 60px;
-            background: linear-gradient(180deg, #161b22 0%, #0d1117 100%);
+            padding: 120px 20px 80px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: rgba(96, 165, 250, 0.1);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            color: #60a5fa;
+            font-weight: 500;
+            margin-bottom: 32px;
+            pointer-events: auto;
+        }
+        .badge .dot {
+            width: 6px; height: 6px;
+            background: #34d399;
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.5); }
         }
         .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-            background: linear-gradient(135deg, #58a6ff, #3fb950);
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -0.03em;
+        }
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, #60a5fa 0%, #34d399 50%, #a78bfa 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            background-size: 200% 200%;
+            animation: gradient-shift 5s ease infinite;
+        }
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         .hero p {
-            font-size: 1.25rem;
-            color: #8b949e;
+            font-size: 1.2rem;
+            color: #94a3b8;
+            line-height: 1.7;
+            max-width: 560px;
+            margin: 0 auto 40px;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            pointer-events: auto;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: #fff;
+            box-shadow: 0 0 24px rgba(59, 130, 246, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+            text-decoration: none;
+            color: #fff;
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: #fff;
+        }
+        .btn svg { width: 18px; height: 18px; }
+
+        /* STATS */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            padding: 40px 20px;
             max-width: 600px;
-            margin: 0 auto 32px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+        .stat-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* FEATURES */
+        .features {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 80px 20px;
+        }
+        .features-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .features-header h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+        .features-header p {
+            color: #64748b;
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: auto;
+        }
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(96, 165, 250, 0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .feature-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+        }
+        .fi-blue { background: rgba(59, 130, 246, 0.15); }
+        .fi-green { background: rgba(52, 211, 153, 0.15); }
+        .fi-purple { background: rgba(167, 139, 250, 0.15); }
+        .fi-orange { background: rgba(251, 146, 60, 0.15); }
+        .feature-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #f1f5f9;
+        }
+        .feature-card p {
+            color: #64748b;
+            font-size: 0.9rem;
             line-height: 1.6;
         }
-        .buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-        .btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 24px; border-radius: 8px; font-size: 1rem;
-            font-weight: 600; transition: all 0.2s; border: none; cursor: pointer;
-        }
-        .btn-primary { background: #238636; color: #fff; }
-        .btn-primary:hover { background: #2ea043; text-decoration: none; }
-        .btn-secondary { background: #21262d; color: #e6edf3; border: 1px solid #30363d; }
-        .btn-secondary:hover { background: #30363d; text-decoration: none; }
-        .features {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 24px; max-width: 1000px; margin: 0 auto; padding: 60px 20px;
-        }
-        .card {
-            background: #161b22; border: 1px solid #30363d;
-            border-radius: 12px; padding: 24px;
-        }
-        .card h3 { font-size: 1.1rem; margin-bottom: 8px; }
-        .card p { color: #8b949e; font-size: 0.95rem; line-height: 1.5; }
-        .card .icon { font-size: 1.5rem; margin-bottom: 12px; }
+
+        /* PLATFORMS */
         .platforms {
-            text-align: center; padding: 40px 20px 60px;
-            border-top: 1px solid #21262d;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 20px 80px;
+            text-align: center;
         }
-        .platforms h2 { font-size: 1.5rem; margin-bottom: 24px; }
-        .platform-list { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; }
-        .platform-item { color: #8b949e; font-size: 0.95rem; }
+        .platforms h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            letter-spacing: -0.02em;
+        }
+        .platform-cards {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .platform-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 28px 36px;
+            min-width: 200px;
+            transition: all 0.3s;
+            pointer-events: auto;
+        }
+        .platform-card:hover {
+            border-color: rgba(96, 165, 250, 0.3);
+            background: rgba(96, 165, 250, 0.05);
+            transform: translateY(-2px);
+        }
+        .platform-card .icon { font-size: 2rem; margin-bottom: 12px; }
+        .platform-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+        .platform-card p { font-size: 0.8rem; color: #64748b; }
+
+        /* CTA */
+        .cta {
+            text-align: center;
+            padding: 80px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .cta h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .cta p {
+            color: #64748b;
+            font-size: 1.05rem;
+            margin-bottom: 32px;
+        }
+
+        /* FOOTER */
         footer {
-            text-align: center; padding: 24px 20px;
-            border-top: 1px solid #21262d; color: #484f58;
-            font-size: 0.85rem; margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 32px 20px;
+            text-align: center;
+            color: #475569;
+            font-size: 0.85rem;
+        }
+        footer a { color: #64748b; }
+        footer a:hover { color: #94a3b8; }
+
+        /* MOBILE */
+        @media (max-width: 640px) {
+            nav { padding: 16px 20px; }
+            .nav-links { display: none; }
+            .hero { padding: 80px 20px 60px; }
+            .stats { gap: 24px; }
+            .features { padding: 40px 20px; }
         }
     </style>
 </head>
 <body>
-    <div class="hero">
-        <h1>Spark</h1>
-        <p>Flash OS images to SD cards &amp; USB drives — fast, clean, zero telemetry. A privacy-focused fork of balenaEtcher.</p>
-        <div class="buttons">
-            <a href="https://github.com/sparkflash-dev/spark/releases/latest" class="btn btn-primary">Download</a>
-            <a href="https://github.com/sparkflash-dev/spark" class="btn btn-secondary">Source Code</a>
+
+<canvas id="bg"></canvas>
+
+<div class="content">
+    <nav>
+        <div class="nav-logo">
+            <img src="https://raw.githubusercontent.com/sparkflash-dev/spark/main/assets/icon.png" alt="Spark">
+            Spark
         </div>
-    </div>
-    <div class="features">
-        <div class="card"><div class="icon">🔒</div><h3>Zero Telemetry</h3><p>No Sentry, no Mixpanel, no analytics. Your data stays on your machine.</p></div>
-        <div class="card"><div class="icon">⚡</div><h3>Fast &amp; Clean</h3><p>No marketing webviews, no update pings. Just the tool you need.</p></div>
-        <div class="card"><div class="icon">🛡️</div><h3>Secure</h3><p>WebSocket validation, XSS fixes, shell injection prevention.</p></div>
-        <div class="card"><div class="icon">📦</div><h3>All Formats</h3><p>Supports .img, .iso, .gz, .xz, .bz2, .zst, .zip and more.</p></div>
-    </div>
-    <div class="platforms">
-        <h2>Available for</h2>
-        <div class="platform-list">
-            <span class="platform-item">🐧 Linux (.deb, .rpm, .zip)</span>
-            <span class="platform-item">🪟 Windows (.exe)</span>
-            <span class="platform-item">🍎 macOS (Intel &amp; Apple Silicon)</span>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#platforms">Platforms</a>
+            <a href="https://github.com/sparkflash-dev/spark">GitHub</a>
         </div>
-    </div>
-    <footer><p>Apache 2.0 License · <a href="https://github.com/sparkflash-dev/spark">sparkflash-dev/spark</a></p></footer>
+    </nav>
+
+    <section class="hero">
+        <div class="badge"><span class="dot"></span> Open Source & Free Forever</div>
+        <h1>Flash OS images<br><span class="gradient">without the spyware</span></h1>
+        <p>A clean, privacy-first tool to write OS images to SD cards and USB drives. Zero telemetry. Zero ads. Just works.</p>
+        <div class="hero-buttons">
+            <a href="https://github.com/sparkflash-dev/spark/releases/latest" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download
+            </a>
+            <a href="https://github.com/sparkflash-dev/spark" class="btn btn-secondary">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12 24 5.37 18.63 0 12 0z"/></svg>
+                Source Code
+            </a>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="stat">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Trackers</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">100%</div>
+            <div class="stat-label">Offline</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">20+</div>
+            <div class="stat-label">Formats</div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="features-header">
+            <h2>Built different</h2>
+            <p>Everything you need. Nothing you don't.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon fi-blue">&#128274;</div>
+                <h3>Zero Telemetry</h3>
+                <p>No Sentry, no Mixpanel, no analytics whatsoever. We ripped it all out. Your data never leaves your machine.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon fi-green">&#9889;</div>
+                <h3>Blazing Fast</h3>
+                <p>No marketing webviews, no update pings, no background services. Launches instantly, writes at full speed.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon fi-purple">&#128737;&#65039;</div>
+                <h3>Hardened Security</h3>
+                <p>WebSocket origin validation, XSS protection, shell injection prevention. Audited and patched.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon fi-orange">&#128230;</div>
+                <h3>Universal Format Support</h3>
+                <p>Flash .img, .iso, .gz, .xz, .bz2, .zst, .zip and more. Drag, drop, done.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="platforms" id="platforms">
+        <h2>Available everywhere</h2>
+        <div class="platform-cards">
+            <div class="platform-card">
+                <div class="icon">&#128039;</div>
+                <h3>Linux</h3>
+                <p>.deb / .rpm / .zip</p>
+            </div>
+            <div class="platform-card">
+                <div class="icon">&#129695;</div>
+                <h3>Windows</h3>
+                <p>.exe installer / .zip</p>
+            </div>
+            <div class="platform-card">
+                <div class="icon">&#127822;</div>
+                <h3>macOS</h3>
+                <p>Intel & Apple Silicon</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <h2>Ready to flash?</h2>
+        <p>Download Spark and get back to what matters — your project, not your tools.</p>
+        <a href="https://github.com/sparkflash-dev/spark/releases/latest" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Latest Release
+        </a>
+    </section>
+
+    <footer>
+        <p>Apache 2.0 License &middot; <a href="https://github.com/sparkflash-dev/spark">sparkflash-dev/spark</a> &middot; A privacy-focused fork of balenaEtcher</p>
+    </footer>
+</div>
+
+<script>
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+
+let W, H;
+const particles = [];
+const connections = [];
+const PARTICLE_COUNT = 80;
+const CONNECT_DIST = 150;
+const MOUSE_DIST = 200;
+let mouse = { x: -1000, y: -1000, down: false };
+let clickPoint = null;
+
+function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+class Particle {
+    constructor(x, y) {
+        this.x = x || Math.random() * W;
+        this.y = y || Math.random() * H;
+        this.vx = (Math.random() - 0.5) * 0.6;
+        this.vy = (Math.random() - 0.5) * 0.6;
+        this.r = Math.random() * 2 + 1;
+        this.baseAlpha = Math.random() * 0.5 + 0.2;
+        this.alpha = this.baseAlpha;
+        this.hue = Math.random() * 60 + 200; // blue-purple range
+    }
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > W) this.vx *= -1;
+        if (this.y < 0 || this.y > H) this.vy *= -1;
+
+        // mouse attraction
+        const dx = mouse.x - this.x;
+        const dy = mouse.y - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MOUSE_DIST) {
+            const force = (MOUSE_DIST - dist) / MOUSE_DIST * 0.02;
+            this.vx += dx * force;
+            this.vy += dy * force;
+            this.alpha = this.baseAlpha + (1 - dist / MOUSE_DIST) * 0.5;
+        } else {
+            this.alpha += (this.baseAlpha - this.alpha) * 0.05;
+        }
+
+        // damping
+        this.vx *= 0.99;
+        this.vy *= 0.99;
+    }
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${this.hue}, 80%, 70%, ${this.alpha})`;
+        ctx.fill();
+    }
+}
+
+// persistent connections made by clicking
+class Connection {
+    constructor(a, b) {
+        this.a = a;
+        this.b = b;
+        this.life = 1;
+        this.decay = 0.003;
+    }
+    update() {
+        this.life -= this.decay;
+    }
+    draw() {
+        if (this.life <= 0) return;
+        const grad = ctx.createLinearGradient(this.a.x, this.a.y, this.b.x, this.b.y);
+        grad.addColorStop(0, `hsla(${this.a.hue}, 80%, 60%, ${this.life * 0.6})`);
+        grad.addColorStop(1, `hsla(${this.b.hue}, 80%, 60%, ${this.life * 0.6})`);
+        ctx.beginPath();
+        ctx.moveTo(this.a.x, this.a.y);
+        ctx.lineTo(this.b.x, this.b.y);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = this.life * 2;
+        ctx.stroke();
+    }
+}
+
+for (let i = 0; i < PARTICLE_COUNT; i++) {
+    particles.push(new Particle());
+}
+
+canvas.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+});
+canvas.addEventListener('mouseleave', () => {
+    mouse.x = -1000;
+    mouse.y = -1000;
+});
+canvas.addEventListener('click', (e) => {
+    const cx = e.clientX;
+    const cy = e.clientY;
+
+    // find nearby particles and connect them
+    const nearby = particles.filter(p => {
+        const d = Math.sqrt((p.x - cx) ** 2 + (p.y - cy) ** 2);
+        return d < MOUSE_DIST;
+    });
+
+    for (let i = 0; i < nearby.length; i++) {
+        for (let j = i + 1; j < nearby.length; j++) {
+            connections.push(new Connection(nearby[i], nearby[j]));
+        }
+        // pulse effect
+        nearby[i].r = Math.min(nearby[i].r + 2, 6);
+        nearby[i].alpha = 1;
+    }
+
+    // spawn a burst of new particles
+    for (let i = 0; i < 5; i++) {
+        const p = new Particle(cx + (Math.random() - 0.5) * 40, cy + (Math.random() - 0.5) * 40);
+        p.vx = (Math.random() - 0.5) * 3;
+        p.vy = (Math.random() - 0.5) * 3;
+        p.alpha = 1;
+        p.hue = Math.random() * 60 + 200;
+        particles.push(p);
+    }
+
+    // cap particles
+    while (particles.length > PARTICLE_COUNT + 40) {
+        particles.shift();
+    }
+});
+
+function drawProximityLines() {
+    for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < CONNECT_DIST) {
+                const alpha = (1 - dist / CONNECT_DIST) * 0.15;
+                ctx.beginPath();
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.strokeStyle = `rgba(100, 160, 255, ${alpha})`;
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+            }
+        }
+    }
+}
+
+function animate() {
+    ctx.clearRect(0, 0, W, H);
+
+    // subtle radial glow at center
+    const grd = ctx.createRadialGradient(W / 2, H * 0.35, 0, W / 2, H * 0.35, W * 0.5);
+    grd.addColorStop(0, 'rgba(59, 130, 246, 0.03)');
+    grd.addColorStop(1, 'rgba(6, 8, 13, 0)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+
+    drawProximityLines();
+
+    // update & draw persistent connections
+    for (let i = connections.length - 1; i >= 0; i--) {
+        connections[i].update();
+        connections[i].draw();
+        if (connections[i].life <= 0) connections.splice(i, 1);
+    }
+
+    particles.forEach(p => {
+        p.update();
+        p.draw();
+        // restore radius
+        p.r += (Math.random() * 2 + 1 - p.r) * 0.02;
+    });
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
 </body>
 </html>
-
